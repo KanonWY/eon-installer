@@ -1,8 +1,9 @@
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
-#[command(name = "eon")]
-#[command(about = "eon cli", long_about = None)]
+#[command(name = "eon 命令行工具")]
+#[command(version = "0.0.1")]
+#[command(about = "eon cli", long_about = "eon 开发工具箱子")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -37,7 +38,6 @@ struct EnvArgs {
 enum EnvCommands {
     /// 显示环境信息
     List {},
-
     /// 显示指定环境软件的版本
     Info { soft_name: Option<String> },
     /// 安装需要的环境软件
@@ -61,18 +61,33 @@ fn main() {
         }
         Commands::Env(env) => match env.command {
             Some(envargs) => match envargs {
-                EnvCommands::Info { soft_name } => {
-                    println!("显示某一个软件的信息{}", soft_name.unwrap());
-                }
+                EnvCommands::Info { soft_name } => match soft_name {
+                    Some(sf) => {
+                        println!("显示 {} 系统软件的信息!", sf);
+                    }
+                    None => {
+                        println!("Info 必须指定软件的名字");
+                    }
+                },
                 EnvCommands::List {} => {
-                    println!("显示当前的环境信息");
+                    println!("显示当前环境的系统软件环境");
                 }
-                EnvCommands::Install { softs } => {
-                    println!("安装某一个软件{}", softs.unwrap());
-                }
-                EnvCommands::Uninstall { softs } => {
-                    println!("卸载某一个软件{}", softs.unwrap());
-                }
+                EnvCommands::Install { softs } => match softs {
+                    Some(sfs) => {
+                        println!("安装系统软件 {}", sfs);
+                    }
+                    None => {
+                        println!("Install 必须指定一个软件,例如: cmake eCAL");
+                    }
+                },
+                EnvCommands::Uninstall { softs } => match softs {
+                    Some(sfs) => {
+                        println!("卸载系统软件 {}", sfs);
+                    }
+                    None => {
+                        println!("Uninstall 必须指定一个已安装的软件,例如：cmake eCAL");
+                    }
+                },
             },
             None => {
                 unreachable!("env 必须指定参数!");
